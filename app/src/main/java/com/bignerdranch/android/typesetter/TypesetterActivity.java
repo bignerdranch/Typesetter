@@ -1,12 +1,19 @@
 package com.bignerdranch.android.typesetter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.View;
@@ -15,9 +22,13 @@ import android.widget.ArrayAdapter;
 
 import com.bignerdranch.android.typesetter.databinding.ActivityTypesetterBinding;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.TypefaceUtils;
+
 
 public class TypesetterActivity extends AppCompatActivity {
 
@@ -34,6 +45,32 @@ public class TypesetterActivity extends AppCompatActivity {
             // display as 14.1 because it rounded the value on construction
             activityTypesetterBinding.fillerTextView.setTextSize(14);
         }
+
+        activityTypesetterBinding.button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap bitmap = getBitmapFromView(activityTypesetterBinding.constraint);
+                File dir = getFilesDir();
+                File file = new File(dir, "test.png");
+                try {
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Uri uri = FileProvider.getUriForFile(TypesetterActivity.this,
+                        "com.bignerdranch.android.typesetter.fileprovider",
+                        file);
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("image/png");
+                intent.putExtra(Intent.EXTRA_STREAM, uri);
+
+                startActivity(intent);
+
+            }
+        });
 
         fonts = Font.listAssetFonts(this);
         activityTypesetterBinding.fontSpinner.setAdapter(new FontAdapter(this, fonts));
@@ -62,6 +99,25 @@ public class TypesetterActivity extends AppCompatActivity {
         });
 
         updateValues();
+    }
+
+    public Bitmap getBitmapFromView(View view) {
+        //Define a bitmap with the same size as the view
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
+        //Bind a canvas to it
+        Canvas canvas = new Canvas(returnedBitmap);
+        //Get the view's background
+        Drawable bgDrawable =view.getBackground();
+        if (bgDrawable!=null)
+            //has background drawable, then draw it on the canvas
+            bgDrawable.draw(canvas);
+        else
+            //does not have background drawable, then draw white background on the canvas
+            canvas.drawColor(Color.WHITE);
+        // draw the view on the canvas
+        view.draw(canvas);
+        //return the bitmap
+        return returnedBitmap;
     }
 
     private void updateValues() {
