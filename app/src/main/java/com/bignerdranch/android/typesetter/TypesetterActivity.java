@@ -29,8 +29,13 @@ public class TypesetterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activityTypesetterBinding = DataBindingUtil.setContentView(this, R.layout.activity_typesetter);
 
-        fonts = Font.listAssetFonts(this);
+        if (savedInstanceState == null) {
+            // Text view sets the text size using an int, so it looses SP precision and would
+            // display as 14.1 because it rounded the value on construction
+            activityTypesetterBinding.fillerTextView.setTextSize(14);
+        }
 
+        fonts = Font.listAssetFonts(this);
         activityTypesetterBinding.fontSpinner.setAdapter(new FontAdapter(this, fonts));
         activityTypesetterBinding.fontSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -45,7 +50,7 @@ public class TypesetterActivity extends AppCompatActivity {
             }
         });
 
-        activityTypesetterBinding.button.setOnClickListener(new View.OnClickListener() {
+        activityTypesetterBinding.renderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateTextSize();
@@ -55,6 +60,28 @@ public class TypesetterActivity extends AppCompatActivity {
                 updateLineSpacing();
             }
         });
+
+        updateValues();
+    }
+
+    private void updateValues() {
+        float textSize = activityTypesetterBinding.fillerTextView.getTextSize();
+        textSize = textSize / getResources().getDisplayMetrics().scaledDensity;
+        activityTypesetterBinding.fontSizeEditText.setText(formatFloat(textSize));
+
+        float letterSpacing = activityTypesetterBinding.fillerTextView.getLetterSpacing();
+        activityTypesetterBinding.letterSpacingEditText.setText(formatFloat(letterSpacing));
+
+        float lineSpacing = activityTypesetterBinding.fillerTextView.getLineSpacingExtra();
+        lineSpacing = lineSpacing / getResources().getDisplayMetrics().scaledDensity;
+        activityTypesetterBinding.lineSpacingEditText.setText(formatFloat(lineSpacing));
+    }
+
+    public static String formatFloat(float floatValue) {
+        if(floatValue == (int) floatValue)
+            return String.format("%d", (int) floatValue);
+        else
+            return String.format("%s", floatValue);
     }
 
     private void updateTextSize() {
@@ -78,8 +105,10 @@ public class TypesetterActivity extends AppCompatActivity {
 
     private void updateLineSpacing() {
         String lineSpacing = activityTypesetterBinding.lineSpacingEditText.getText().toString();
-        float lineSpacingsp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Float.parseFloat(lineSpacing), getResources().getDisplayMetrics());
-        activityTypesetterBinding.fillerTextView.setLineSpacing(lineSpacingsp ,activityTypesetterBinding.fillerTextView.getLineSpacingMultiplier());
+        float lineSpacingSp = Float.parseFloat(lineSpacing);
+        float lineSpacingPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, lineSpacingSp, getResources().getDisplayMetrics());
+        float multiplier = activityTypesetterBinding.fillerTextView.getLineSpacingMultiplier();
+        activityTypesetterBinding.fillerTextView.setLineSpacing(lineSpacingPx, multiplier);
     }
 
     private static class FontAdapter extends ArrayAdapter<Font> {
