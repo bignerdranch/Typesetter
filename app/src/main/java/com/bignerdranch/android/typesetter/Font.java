@@ -6,7 +6,6 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 class Font {
@@ -29,22 +28,30 @@ class Font {
         return fonts;
     }
 
-    private String fontName;
+    private String fileName;
+    private String displayName;
 
-    public Font(String fontName) {
-        this.fontName = fontName;
+    public Font(String fileName) {
+        this.fileName = fileName;
+        displayName = cleanUpFileName(fileName);
     }
 
-    public String getFontName() {
-        return fontName;
+    private String cleanUpFileName(String fileName) {
+        fileName = fileName.replace("-", " ");
+        fileName = fileName.replace(".ttf", "");
+        return fileName;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public String getDisplayName() {
-        return fontName;
+        return displayName;
     }
 
     @Override
     public String toString() {
-        return getDisplayName();
+        return displayName;
     }
 }
