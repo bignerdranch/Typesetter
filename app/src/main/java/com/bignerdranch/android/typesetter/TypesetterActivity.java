@@ -43,7 +43,7 @@ public class TypesetterActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Text view sets the text size using an int, so it looses SP precision and would
             // display as 14.1 because it rounded the value on construction
-            activityTypesetterBinding.fillerTextView.setTextSize(14);
+            activityTypesetterBinding.fillerTextView.setTextSize(24);
         }
 
         activityTypesetterBinding.button.setOnClickListener(new View.OnClickListener() {
@@ -126,7 +126,11 @@ public class TypesetterActivity extends AppCompatActivity {
         activityTypesetterBinding.fontSizeEditText.setText(formatFloat(textSize));
 
         float letterSpacing = activityTypesetterBinding.fillerTextView.getLetterSpacing();
-        activityTypesetterBinding.letterSpacingEditText.setText(formatFloat(letterSpacing));
+        if (letterSpacing == 0) {
+            activityTypesetterBinding.letterSpacingEditText.setText("0.00");
+        } else {
+            activityTypesetterBinding.letterSpacingEditText.setText(formatFloat(letterSpacing));
+        }
 
         float lineSpacing = activityTypesetterBinding.fillerTextView.getLineSpacingExtra();
         lineSpacing = lineSpacing / getResources().getDisplayMetrics().scaledDensity;

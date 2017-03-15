@@ -6,7 +6,8 @@
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:background="#FAFAFA">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraint"
@@ -18,107 +19,39 @@
                 android:id="@+id/font_spinner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:layout_marginLeft="8dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"  />
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/font_size_TextInputLayout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintRight_toLeftOf="@+id/letter_spacing_text_input_layout"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintTop_toBottomOf="@+id/font_spinner">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/font_size_editText"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="@string/font_size"
-                    android:inputType="numberDecimal"
-                    android:textSize="16sp" />
-
-            </android.support.design.widget.TextInputLayout>
-
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/letter_spacing_text_input_layout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintLeft_toRightOf="@+id/font_size_TextInputLayout"
-                app:layout_constraintRight_toLeftOf="@+id/line_spacing_text_input_layout"
-                app:layout_constraintTop_toTopOf="@+id/font_size_TextInputLayout">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/letter_spacing_editText"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="@string/letter_spacing"
-                    android:inputType="numberSigned|numberDecimal"
-                    android:textSize="16sp"/>
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/line_spacing_text_input_layout"
-                android:layout_marginRight="8dp"
-                android:layout_marginEnd="8dp"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/letter_spacing_text_input_layout"
-                app:layout_constraintTop_toTopOf="@+id/letter_spacing_text_input_layout">
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/line_spacing_editText"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textSize="16sp"
-                    android:inputType="numberSigned|numberDecimal"
-                    android:hint="@string/line_spacing" />
-
-            </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/renderButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/render"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
                 app:layout_constraintTop_toBottomOf="@+id/font_size_TextInputLayout"
-                app:layout_constraintLeft_toLeftOf="parent" />
+                android:layout_marginLeft="0dp"
+                app:layout_constraintLeft_toLeftOf="@+id/font_spinner" />
 
             <TextView
                 android:id="@+id/fillerTextView"
-                android:text="@string/filler_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                app:layout_constraintTop_toBottomOf="@+id/renderButton"
-                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginLeft="0dp"
+                android:text="@string/filler_text"
+                app:layout_constraintLeft_toLeftOf="@+id/renderButton"
+                android:layout_marginRight="0dp"
+                app:layout_constraintRight_toRightOf="@+id/letter_spacing_text_input_layout"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintVertical_bias="0.0"
-                app:layout_constraintRight_toRightOf="parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@+id/renderButton" />
 
             <Button
                 android:id="@+id/button"
@@ -127,7 +60,77 @@
                 android:text="Button"
                 app:layout_constraintLeft_toRightOf="@+id/renderButton"
                 android:layout_marginLeft="8dp"
-                app:layout_constraintBaseline_toBaselineOf="@+id/renderButton" />
+                app:layout_constraintTop_toTopOf="@+id/renderButton"
+                android:layout_marginTop="0dp" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/letter_spacing_text_input_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:hintTextAppearance="@style/TextLabel"
+                app:layout_constraintRight_toRightOf="@+id/font_spinner"
+                app:layout_constraintLeft_toRightOf="@+id/line_spacing_text_input_layout"
+                app:layout_constraintTop_toTopOf="@+id/line_spacing_text_input_layout"
+                android:layout_marginTop="0dp"
+                android:layout_marginRight="0dp"
+                android:layout_marginLeft="12dp">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/letter_spacing_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/letter_spacing"
+                    android:inputType="numberSigned|numberDecimal"
+                    android:textColor="#008ECC"
+                    android:textSize="24sp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/font_size_TextInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:hintTextAppearance="@style/TextLabel"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintRight_toLeftOf="@+id/line_spacing_text_input_layout"
+                app:layout_constraintLeft_toLeftOf="@+id/font_spinner"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@+id/font_spinner"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="12dp">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/font_size_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/font_size"
+                    android:inputType="numberDecimal"
+                    android:textColor="#008ECC"
+                    android:textSize="24sp" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/line_spacing_text_input_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:hintTextAppearance="@style/TextLabel"
+                app:layout_constraintLeft_toRightOf="@+id/font_size_TextInputLayout"
+                app:layout_constraintRight_toLeftOf="@+id/letter_spacing_text_input_layout"
+                app:layout_constraintTop_toTopOf="@+id/font_size_TextInputLayout"
+                android:layout_marginTop="0dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginLeft="12dp">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/line_spacing_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/line_spacing"
+                    android:inputType="numberSigned|numberDecimal"
+                    android:textColor="#008ECC"
+                    android:textSize="24sp" />
+
+            </android.support.design.widget.TextInputLayout>
 
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>

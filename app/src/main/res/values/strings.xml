@@ -3,6 +3,6 @@
     <string name="font_size">Font size</string>
     <string name="line_spacing">Line spacing</string>
     <string name="letter_spacing">Letter spacing</string>
-    <string name="filler_text">The quick brown fox jumps over the lazy dog. THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG\'S BACK 1234567890. The quick brown fox jumps over the lazy dog. THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG\'S BACK 1234567890. The quick brown fox jumps over the lazy dog. THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG\'S BACK 1234567890.</string>
+    <string name="filler_text">The quick brown fox jumps over the lazy dog. THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG\'S BACK 1234567890. The quick brown fox jumps over the lazy dog. THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG\'S BACK 1234567890.</string>
     <string name="render">Render</string>
 </resources>
