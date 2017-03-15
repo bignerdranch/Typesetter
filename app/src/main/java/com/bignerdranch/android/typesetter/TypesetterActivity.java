@@ -4,17 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
@@ -31,6 +30,7 @@ import uk.co.chrisjenx.calligraphy.TypefaceUtils;
 
 
 public class TypesetterActivity extends AppCompatActivity {
+    private static final String TAG = "TypesetterActivity";
 
     private List<Font> fonts;
     private ActivityTypesetterBinding activityTypesetterBinding;
@@ -46,29 +46,10 @@ public class TypesetterActivity extends AppCompatActivity {
             activityTypesetterBinding.fillerTextView.setTextSize(24);
         }
 
-        activityTypesetterBinding.button.setOnClickListener(new View.OnClickListener() {
+        activityTypesetterBinding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap bitmap = getBitmapFromView(activityTypesetterBinding.constraint);
-                File dir = getFilesDir();
-                File file = new File(dir, "test.png");
-                try {
-                    FileOutputStream outputStream = new FileOutputStream(file);
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                Uri uri = FileProvider.getUriForFile(TypesetterActivity.this,
-                        "com.bignerdranch.android.typesetter.fileprovider",
-                        file);
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("image/png");
-                intent.putExtra(Intent.EXTRA_STREAM, uri);
-
-                startActivity(intent);
-
+                shareScreenshot();
             }
         });
 
@@ -101,40 +82,56 @@ public class TypesetterActivity extends AppCompatActivity {
         updateValues();
     }
 
-    public Bitmap getBitmapFromView(View view) {
-        //Define a bitmap with the same size as the view
-        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
-        //Bind a canvas to it
-        Canvas canvas = new Canvas(returnedBitmap);
-        //Get the view's background
-        Drawable bgDrawable =view.getBackground();
-        if (bgDrawable!=null)
-            //has background drawable, then draw it on the canvas
-            bgDrawable.draw(canvas);
-        else
-            //does not have background drawable, then draw white background on the canvas
-            canvas.drawColor(Color.WHITE);
-        // draw the view on the canvas
-        view.draw(canvas);
-        //return the bitmap
-        return returnedBitmap;
+    private void shareScreenshot() {
+        Bitmap bitmap = BitmapUtils.getBitmapFromView(activityTypesetterBinding.constraint);
+        File dir = getFilesDir();
+        File file = new File(dir, "font-screenshot.png");
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            outputStream.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to save screenshot");
+        }
+
+        Uri uri = FileProvider.getUriForFile(TypesetterActivity.this,
+                "com.bignerdranch.android.typesetter.fileprovider",
+                file);
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("image/png");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+
+        startActivity(intent);
     }
+
+
 
     private void updateValues() {
         float textSize = activityTypesetterBinding.fillerTextView.getTextSize();
         textSize = textSize / getResources().getDisplayMetrics().scaledDensity;
         activityTypesetterBinding.fontSizeEditText.setText(formatFloat(textSize));
 
-        float letterSpacing = activityTypesetterBinding.fillerTextView.getLetterSpacing();
-        if (letterSpacing == 0) {
-            activityTypesetterBinding.letterSpacingEditText.setText("0.00");
-        } else {
-            activityTypesetterBinding.letterSpacingEditText.setText(formatFloat(letterSpacing));
-        }
+        updateLetterSpacingFields();
 
         float lineSpacing = activityTypesetterBinding.fillerTextView.getLineSpacingExtra();
         lineSpacing = lineSpacing / getResources().getDisplayMetrics().scaledDensity;
         activityTypesetterBinding.lineSpacingEditText.setText(formatFloat(lineSpacing));
+    }
+
+    private void updateLetterSpacingFields() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            activityTypesetterBinding.letterSpacingTextInputLayout.setEnabled(true);
+            activityTypesetterBinding.letterSpacingEditText.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+            float letterSpacing = activityTypesetterBinding.fillerTextView.getLetterSpacing();
+            if (letterSpacing == 0) {
+                activityTypesetterBinding.letterSpacingEditText.setText("0.00");
+            } else {
+                activityTypesetterBinding.letterSpacingEditText.setText(formatFloat(letterSpacing));
+            }
+        } else {
+            activityTypesetterBinding.letterSpacingTextInputLayout.setEnabled(false);
+            activityTypesetterBinding.letterSpacingEditText.setTextColor(ContextCompat.getColor(this, R.color.light_grey));
+        }
     }
 
     public static String formatFloat(float floatValue) {
