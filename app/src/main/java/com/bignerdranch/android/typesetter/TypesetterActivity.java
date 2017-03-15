@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
@@ -49,10 +50,16 @@ public class TypesetterActivity extends AppCompatActivity {
         activityTypesetterBinding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                updateFillerText();
+                View current = getCurrentFocus();
+                if (current != null) current.clearFocus();
                 shareScreenshot();
+                hidekeyboard();
             }
         });
 
+
+        getSupportActionBar();
         fonts = Font.listAssetFonts(this);
         activityTypesetterBinding.fontSpinner.setAdapter(new FontAdapter(this, fonts));
         activityTypesetterBinding.fontSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -71,15 +78,30 @@ public class TypesetterActivity extends AppCompatActivity {
         activityTypesetterBinding.renderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateTextSize();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    updateLetterSpacing();
-                }
-                updateLineSpacing();
+                updateFillerText();
+                hidekeyboard();
             }
         });
 
         updateValues();
+        updateFillerText();
+    }
+
+    private void hidekeyboard() {
+        View view = getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+        activityTypesetterBinding.coord.requestFocus();
+    }
+
+    private void updateFillerText() {
+        updateTextSize();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            updateLetterSpacing();
+        }
+        updateLineSpacing();
     }
 
     private void shareScreenshot() {
@@ -171,8 +193,8 @@ public class TypesetterActivity extends AppCompatActivity {
     private static class FontAdapter extends ArrayAdapter<Font> {
 
         public FontAdapter(@NonNull Context context, @NonNull List<Font> fonts) {
-            super(context, android.R.layout.simple_list_item_1, fonts);
+            super(context, R.layout.closed_textview, fonts);
+            setDropDownViewResource(R.layout.dropdown_textview);
         }
-
     }
 }

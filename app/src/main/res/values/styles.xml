@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionBarStyle">@style/MyActionBar</item>
+        <item name="toolbarStyle">@style/ToolbarStyle</item>
     </style>
 
     <style name="TextLabel" parent="TextAppearance.AppCompat">
@@ -13,4 +15,13 @@
         <item name="android:textSize">15sp</item>
     </style>
 
+    <style name="ToolbarStyle" parent="@style/Widget.AppCompat.Toolbar">
+        <item name="contentInsetStart">24dp</item>
+        <item name="android:contentInsetStart">24dp</item>
+    </style>
+
+    <style name="MyActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="contentInsetStart">24dp</item>
+        <item name="android:contentInsetStart">24dp</item>
+    </style>
 </resources>
