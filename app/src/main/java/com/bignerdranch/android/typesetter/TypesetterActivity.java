@@ -10,13 +10,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
@@ -29,83 +29,116 @@ import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.TypefaceUtils;
 
+import static com.bignerdranch.android.typesetter.AndroidUtils.IS_LOLLIPOP_AND_ABOVE;
+import static com.bignerdranch.android.typesetter.AndroidUtils.formatFloat;
+
 
 public class TypesetterActivity extends AppCompatActivity {
     private static final String TAG = "TypesetterActivity";
 
     private List<Font> fonts;
-    private ActivityTypesetterBinding activityTypesetterBinding;
+    private ActivityTypesetterBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityTypesetterBinding = DataBindingUtil.setContentView(this, R.layout.activity_typesetter);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_typesetter);
 
         if (savedInstanceState == null) {
             // Text view sets the text size using an int, so it looses SP precision and would
-            // display as 14.1 because it rounded the value on construction
-            activityTypesetterBinding.fillerTextView.setTextSize(24);
+            // display as 24.xx because it rounded the value on construction
+            binding.fillerTextView.setTextSize(24);
         }
 
-        activityTypesetterBinding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateFillerText();
-                View current = getCurrentFocus();
-                if (current != null) current.clearFocus();
-                shareScreenshot();
-                hidekeyboard();
-            }
-        });
-
-
-        getSupportActionBar();
         fonts = Font.listAssetFonts(this);
-        activityTypesetterBinding.fontSpinner.setAdapter(new FontAdapter(this, fonts));
-        activityTypesetterBinding.fontSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Typeface typeface = TypefaceUtils.load(getAssets(), "fonts/" + fonts.get(position).getFileName());
-                activityTypesetterBinding.fillerTextView.setTypeface(typeface);
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
+        binding.fontSpinner.setAdapter(new FontAdapter(this, fonts));
+        binding.fontSpinner.setOnItemSelectedListener(onItemSelectedListener);
+        binding.renderButton.setOnClickListener(v -> {
+            renderValues();
+            clearInputFocus();
+        });
+        binding.floatingActionButton.setOnClickListener(v -> {
+            renderValues();
+            clearInputFocus();
+            shareScreenshot();
         });
 
-        activityTypesetterBinding.renderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateFillerText();
-                hidekeyboard();
+        initializeEditTextValues();
+        renderValues();
+    }
+
+    private void initializeEditTextValues() {
+        initializeTextSize();
+        initializeLetterSpacing();
+        initializeLineSpacing();
+    }
+
+    private void initializeTextSize() {
+        float textSize = binding.fillerTextView.getTextSize();
+        textSize = textSize / getResources().getDisplayMetrics().scaledDensity;
+        binding.fontSizeEditText.setText(formatFloat(textSize));
+    }
+
+    private void initializeLetterSpacing() {
+        if (IS_LOLLIPOP_AND_ABOVE) {
+            binding.letterSpacingTextInputLayout.setEnabled(true);
+            binding.letterSpacingEditText.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+            float letterSpacing = binding.fillerTextView.getLetterSpacing();
+            if (letterSpacing == 0) {
+                binding.letterSpacingEditText.setText("0.00");
+            } else {
+                binding.letterSpacingEditText.setText(formatFloat(letterSpacing));
             }
-        });
-
-        updateValues();
-        updateFillerText();
+        } else {
+            binding.letterSpacingTextInputLayout.setEnabled(false);
+            binding.letterSpacingEditText.setTextColor(ContextCompat.getColor(this, R.color.light_grey));
+        }
     }
 
-    private void hidekeyboard() {
-        View view = getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-        activityTypesetterBinding.coord.requestFocus();
+    private void initializeLineSpacing() {
+        float lineSpacing = binding.fillerTextView.getLineSpacingExtra();
+        lineSpacing = lineSpacing / getResources().getDisplayMetrics().scaledDensity;
+        binding.lineSpacingEditText.setText(formatFloat(lineSpacing));
     }
 
-    private void updateFillerText() {
-        updateTextSize();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            updateLetterSpacing();
+    private void renderValues() {
+        applyTextSize();
+        if (IS_LOLLIPOP_AND_ABOVE) {
+            applyLetterSpacing();
         }
-        updateLineSpacing();
+        applyLineSpacing();
+    }
+
+    private void applyTextSize() {
+        String size = binding.fontSizeEditText.getText().toString();
+        float sizeSp = Float.parseFloat(size);
+        if (sizeSp <= 0) {
+            binding.fontSizeTextInputLayout.setErrorEnabled(true);
+            binding.fontSizeTextInputLayout.setError("Nah");
+        } else {
+            binding.fontSizeTextInputLayout.setErrorEnabled(false);
+        }
+        binding.fillerTextView.setTextSize(sizeSp);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void applyLetterSpacing() {
+        String letterSpacing = binding.letterSpacingEditText.getText().toString();
+        float letterEms = Float.parseFloat(letterSpacing);
+        binding.fillerTextView.setLetterSpacing(letterEms);
+    }
+
+    private void applyLineSpacing() {
+        String lineSpacing = binding.lineSpacingEditText.getText().toString();
+        float lineSpacingSp = Float.parseFloat(lineSpacing);
+        float lineSpacingPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, lineSpacingSp, getResources().getDisplayMetrics());
+        float multiplier = binding.fillerTextView.getLineSpacingMultiplier();
+        binding.fillerTextView.setLineSpacing(lineSpacingPx, multiplier);
     }
 
     private void shareScreenshot() {
-        Bitmap bitmap = BitmapUtils.getBitmapFromView(activityTypesetterBinding.constraint);
+        Bitmap bitmap = BitmapUtils.getBitmapFromView(binding.constraint);
         File dir = getFilesDir();
         File file = new File(dir, "font-screenshot.png");
         try {
@@ -114,6 +147,8 @@ public class TypesetterActivity extends AppCompatActivity {
             outputStream.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to save screenshot");
+            Snackbar.make(binding.coord, "Failed to save screenshot", Snackbar.LENGTH_SHORT).show();
+            return;
         }
 
         Uri uri = FileProvider.getUriForFile(TypesetterActivity.this,
@@ -126,69 +161,22 @@ public class TypesetterActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
-
-    private void updateValues() {
-        float textSize = activityTypesetterBinding.fillerTextView.getTextSize();
-        textSize = textSize / getResources().getDisplayMetrics().scaledDensity;
-        activityTypesetterBinding.fontSizeEditText.setText(formatFloat(textSize));
-
-        updateLetterSpacingFields();
-
-        float lineSpacing = activityTypesetterBinding.fillerTextView.getLineSpacingExtra();
-        lineSpacing = lineSpacing / getResources().getDisplayMetrics().scaledDensity;
-        activityTypesetterBinding.lineSpacingEditText.setText(formatFloat(lineSpacing));
+    private void clearInputFocus() {
+        AndroidUtils.hideKeyboard(this);
+        binding.coord.requestFocus();
     }
 
-    private void updateLetterSpacingFields() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            activityTypesetterBinding.letterSpacingTextInputLayout.setEnabled(true);
-            activityTypesetterBinding.letterSpacingEditText.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
-            float letterSpacing = activityTypesetterBinding.fillerTextView.getLetterSpacing();
-            if (letterSpacing == 0) {
-                activityTypesetterBinding.letterSpacingEditText.setText("0.00");
-            } else {
-                activityTypesetterBinding.letterSpacingEditText.setText(formatFloat(letterSpacing));
-            }
-        } else {
-            activityTypesetterBinding.letterSpacingTextInputLayout.setEnabled(false);
-            activityTypesetterBinding.letterSpacingEditText.setTextColor(ContextCompat.getColor(this, R.color.light_grey));
+    private AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            Typeface typeface = TypefaceUtils.load(getAssets(), "fonts/" + fonts.get(position).getFileName());
+            binding.fillerTextView.setTypeface(typeface);
         }
-    }
 
-    public static String formatFloat(float floatValue) {
-        if(floatValue == (int) floatValue)
-            return String.format("%d", (int) floatValue);
-        else
-            return String.format("%s", floatValue);
-    }
-
-    private void updateTextSize() {
-        String size = activityTypesetterBinding.fontSizeEditText.getText().toString();
-        float sizeSp = Float.parseFloat(size);
-        if (sizeSp <= 0) {
-            activityTypesetterBinding.fontSizeTextInputLayout.setErrorEnabled(true);
-            activityTypesetterBinding.fontSizeTextInputLayout.setError("Nah");
-        } else {
-            activityTypesetterBinding.fontSizeTextInputLayout.setErrorEnabled(false);
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
         }
-        activityTypesetterBinding.fillerTextView.setTextSize(sizeSp);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void updateLetterSpacing() {
-        String letterSpacing = activityTypesetterBinding.letterSpacingEditText.getText().toString();
-        float letterEms = Float.parseFloat(letterSpacing);
-        activityTypesetterBinding.fillerTextView.setLetterSpacing(letterEms);
-    }
-
-    private void updateLineSpacing() {
-        String lineSpacing = activityTypesetterBinding.lineSpacingEditText.getText().toString();
-        float lineSpacingSp = Float.parseFloat(lineSpacing);
-        float lineSpacingPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, lineSpacingSp, getResources().getDisplayMetrics());
-        float multiplier = activityTypesetterBinding.fillerTextView.getLineSpacingMultiplier();
-        activityTypesetterBinding.fillerTextView.setLineSpacing(lineSpacingPx, multiplier);
-    }
+    };
 
     private static class FontAdapter extends ArrayAdapter<Font> {
 
