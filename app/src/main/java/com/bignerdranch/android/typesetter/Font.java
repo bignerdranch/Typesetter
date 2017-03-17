@@ -39,6 +39,7 @@ class Font {
     private String cleanUpFileName(String fileName) {
         fileName = fileName.replace("-", " ");
         fileName = fileName.replace(".ttf", "");
+        fileName = fileName.replace(".otf", "");
         return fileName;
     }
 
