@@ -46,7 +46,7 @@ public class TypesetterActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_typesetter);
 
         if (savedInstanceState == null) {
-            // Text view sets the text size using an int, so it looses SP precision and would
+            // Text view sets the text size using an int, so it loses SP precision and would
             // display as 24.xx because it rounded the value on construction
             binding.fillerTextView.setTextSize(24);
         }
@@ -115,24 +115,21 @@ public class TypesetterActivity extends AppCompatActivity {
         String size = binding.fontSizeEditText.getText().toString();
         try {
             float sizeSp = Float.parseFloat(size);
-            if (sizeSp <= 0) {
-                fontSizeIsOk(false);
-            } else {
-                fontSizeIsOk(true);
+            if (sizeSp > 0) {
                 binding.fillerTextView.setTextSize(sizeSp);
+                updateFontSizeError(false);
+            } else {
+                updateFontSizeError(true);
             }
         } catch (NumberFormatException e) {
-            fontSizeIsOk(false);
+            Log.e(TAG, "Unable to format font size");
+            updateFontSizeError(true);
         }
     }
 
-    private void fontSizeIsOk(boolean sizeIsOk) {
-        if (sizeIsOk) {
-            binding.fontSizeTextInputLayout.setErrorEnabled(false);
-        } else {
-            binding.fontSizeTextInputLayout.setErrorEnabled(true);
-            binding.fontSizeTextInputLayout.setError(getString(R.string.nah));
-        }
+    private void updateFontSizeError(boolean hasError) {
+        binding.fontSizeTextInputLayout.setErrorEnabled(hasError);
+        binding.fontSizeTextInputLayout.setError(getString(R.string.nah));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -143,6 +140,7 @@ public class TypesetterActivity extends AppCompatActivity {
             binding.fillerTextView.setLetterSpacing(letterEms);
             binding.letterSpacingTextInputLayout.setErrorEnabled(false);
         } catch (NumberFormatException e) {
+            Log.e(TAG, "Unable to format letter spacing");
             binding.letterSpacingTextInputLayout.setErrorEnabled(true);
             binding.letterSpacingTextInputLayout.setError(getString(R.string.nah));
         }
@@ -157,6 +155,7 @@ public class TypesetterActivity extends AppCompatActivity {
             binding.fillerTextView.setLineSpacing(lineSpacingPx, multiplier);
             binding.lineSpacingTextInputLayout.setErrorEnabled(false);
         } catch (NumberFormatException e) {
+            Log.e(TAG, "Unable to format line spacing");
             binding.lineSpacingTextInputLayout.setErrorEnabled(true);
             binding.lineSpacingTextInputLayout.setError(getString(R.string.nah));
         }
