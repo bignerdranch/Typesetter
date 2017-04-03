@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -40,7 +41,7 @@ public class TypesetterActivity extends AppCompatActivity {
     private ActivityTypesetterBinding binding;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_typesetter);
 
@@ -112,29 +113,53 @@ public class TypesetterActivity extends AppCompatActivity {
 
     private void applyTextSize() {
         String size = binding.fontSizeEditText.getText().toString();
-        float sizeSp = Float.parseFloat(size);
-        if (sizeSp <= 0) {
-            binding.fontSizeTextInputLayout.setErrorEnabled(true);
-            binding.fontSizeTextInputLayout.setError("Nah");
-        } else {
-            binding.fontSizeTextInputLayout.setErrorEnabled(false);
+        try {
+            float sizeSp = Float.parseFloat(size);
+            if (sizeSp <= 0) {
+                fontSizeIsOk(false);
+            } else {
+                fontSizeIsOk(true);
+                binding.fillerTextView.setTextSize(sizeSp);
+            }
+        } catch (NumberFormatException e) {
+            fontSizeIsOk(false);
         }
-        binding.fillerTextView.setTextSize(sizeSp);
+    }
+
+    private void fontSizeIsOk(boolean sizeIsOk) {
+        if (sizeIsOk) {
+            binding.fontSizeTextInputLayout.setErrorEnabled(false);
+        } else {
+            binding.fontSizeTextInputLayout.setErrorEnabled(true);
+            binding.fontSizeTextInputLayout.setError(getString(R.string.nah));
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void applyLetterSpacing() {
         String letterSpacing = binding.letterSpacingEditText.getText().toString();
-        float letterEms = Float.parseFloat(letterSpacing);
-        binding.fillerTextView.setLetterSpacing(letterEms);
+        try {
+            float letterEms = Float.parseFloat(letterSpacing);
+            binding.fillerTextView.setLetterSpacing(letterEms);
+            binding.letterSpacingTextInputLayout.setErrorEnabled(false);
+        } catch (NumberFormatException e) {
+            binding.letterSpacingTextInputLayout.setErrorEnabled(true);
+            binding.letterSpacingTextInputLayout.setError(getString(R.string.nah));
+        }
     }
 
     private void applyLineSpacing() {
         String lineSpacing = binding.lineSpacingEditText.getText().toString();
-        float lineSpacingSp = Float.parseFloat(lineSpacing);
-        float lineSpacingPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, lineSpacingSp, getResources().getDisplayMetrics());
-        float multiplier = binding.fillerTextView.getLineSpacingMultiplier();
-        binding.fillerTextView.setLineSpacing(lineSpacingPx, multiplier);
+        try {
+            float lineSpacingSp = Float.parseFloat(lineSpacing);
+            float lineSpacingPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, lineSpacingSp, getResources().getDisplayMetrics());
+            float multiplier = binding.fillerTextView.getLineSpacingMultiplier();
+            binding.fillerTextView.setLineSpacing(lineSpacingPx, multiplier);
+            binding.lineSpacingTextInputLayout.setErrorEnabled(false);
+        } catch (NumberFormatException e) {
+            binding.lineSpacingTextInputLayout.setErrorEnabled(true);
+            binding.lineSpacingTextInputLayout.setError(getString(R.string.nah));
+        }
     }
 
     private void shareScreenshot() {
@@ -147,7 +172,7 @@ public class TypesetterActivity extends AppCompatActivity {
             outputStream.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to save screenshot");
-            Snackbar.make(binding.coord, "Failed to save screenshot", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.coord, R.string.failed_to_save_screenshot, Snackbar.LENGTH_SHORT).show();
             return;
         }
 

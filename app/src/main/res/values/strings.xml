@@ -5,4 +5,6 @@
     <string name="letter_spacing">Letter spacing</string>
     <string name="filler_text">The quick brown fox jumps over the lazy dog. THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG\'S BACK 1234567890. \u2022 \u2022 \u2022 \u2022 \u2022 \u2022 The quick brown fox jumps over the lazy dog. THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG\'S BACK 1234567890. \u2022 \u2022 \u2022 \u2022 \u2022 \u2022</string>
     <string name="render">Render</string>
+    <string name="nah">Nah</string>
+    <string name="failed_to_save_screenshot">Failed to save screenshot</string>
 </resources>
