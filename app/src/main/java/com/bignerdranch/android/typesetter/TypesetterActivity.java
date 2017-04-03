@@ -148,7 +148,7 @@ public class TypesetterActivity extends AppCompatActivity {
             outputStream.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to save screenshot");
-            Snackbar.make(binding.coord, "Failed to save screenshot", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.coord, R.string.failed_to_save_screenshot, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
