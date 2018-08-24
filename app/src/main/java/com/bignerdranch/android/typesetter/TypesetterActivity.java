@@ -1,5 +1,6 @@
 package com.bignerdranch.android.typesetter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -28,7 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import uk.co.chrisjenx.calligraphy.TypefaceUtils;
+import io.github.inflationx.calligraphy3.TypefaceUtils;
 
 import static com.bignerdranch.android.typesetter.AndroidUtils.IS_LOLLIPOP_AND_ABOVE;
 import static com.bignerdranch.android.typesetter.AndroidUtils.formatFloat;
@@ -81,6 +82,7 @@ public class TypesetterActivity extends AppCompatActivity {
         binding.fontSizeEditText.setText(formatFloat(textSize));
     }
 
+    @SuppressLint("SetTextI18n")
     private void initializeLetterSpacing() {
         if (IS_LOLLIPOP_AND_ABOVE) {
             binding.letterSpacingTextInputLayout.setEnabled(true);
@@ -204,7 +206,7 @@ public class TypesetterActivity extends AppCompatActivity {
 
     private static class FontAdapter extends ArrayAdapter<Font> {
 
-        public FontAdapter(@NonNull Context context, @NonNull List<Font> fonts) {
+        FontAdapter(@NonNull Context context, @NonNull List<Font> fonts) {
             super(context, R.layout.closed_textview, fonts);
             setDropDownViewResource(R.layout.dropdown_textview);
         }
